@@ -1,0 +1,22 @@
+apiVersion: v2
+publisher: redhat
+name: vscode-ansible
+version: latest
+type: VS Code extension
+displayName: Ansible
+title: Ansible extension
+description: ansible for che
+icon: https://www.eclipse.org/che/images/logo-eclipseche.svg
+repository: https://github.com/ansible/vscode-ansible
+category: Language
+firstPublicationDate: '2022-05-05'
+spec:
+  containers:
+  - image: nmalvankar/crw-ansible-rh:2.12
+    name: vscode-ansible
+    memoryLimit: '512M'
+    args: ['/remote-endpoint/plugin-remote-endpoint']
+  extensions:
+  - https://open-vsx.org/api/redhat/ansible/0.9.0/file/redhat.ansible-0.9.0.vsix
+  - https://github.com/redhat-developer/codeready-workspaces-vscode-extensions/releases/download/v34b6b7e/vscode-python-2020.7.94776.vsix
+  - https://github.com/redhat-developer/codeready-workspaces-vscode-extensions/releases/download/ve96a2bb/vscode-yaml-0.14.0.vsix

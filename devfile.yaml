@@ -1,0 +1,129 @@
+apiVersion: 1.0.0
+metadata:
+  generateName: ansible-demo
+projects:
+  - name: demopoc
+    source:
+      location: 'https://github.com/victorock/demopoc'
+      type: git
+      branch: dev
+  - name: examples
+    source:
+      location: 'https://github.com/ansible/ansible-examples'
+      type: git
+components:
+  - mountSources: true
+    args:
+      - tail
+      - '-f'
+      - /dev/null
+    memoryLimit: 512M
+    type: dockerimage
+    alias: ansible
+## Sidecar image for the Ansible Container    
+## Replace this image with your Ansible Container image    
+    image: 'quay.io/nmalvankar/crw-ansible-rh-secure:2.12'
+    env:
+      - value: /projects/
+        name: HOME
+  - id: ms-python/python/latest
+    type: chePlugin
+  - id: redhat/vscode-yaml/latest
+    type: chePlugin
+  - id: redhat/vscode-xml/latest
+    type: chePlugin
+  - id: vscode/typescript-language-features/latest
+    type: chePlugin
+  - id: bmewburn/vscode-intelephense-client/latest
+    type: chePlugin
+## Entry for VSCode Ansible Extension    
+  - type: chePlugin
+    reference: 'https://raw.githubusercontent.com/nmalvankar/che-ansible/master/plugin/meta.yaml'
+    alias: ansible-plugin
+projects:
+  - name: demopoc
+    source:
+      location: 'https://github.com/victorock/demopoc'
+      type: git
+      branch: dev
+  - name: ansible-role-tower-config
+    source:
+      location: 'https://github.com/victorock/ansible-role-tower-config'
+      type: git
+      branch: dev
+  - name: workshops
+    source:
+      location: 'https://github.com/ansible/workshops'
+      type: git
+  - name: examples
+    source:
+      location: 'https://github.com/ansible/ansible-examples'
+      type: git
+
+components:
+  - alias: ansible
+    type: dockerimage
+    image: quay.io/sunix/che-remote-plugin-ansible
+    memoryLimit: 512M
+    mountSources: true
+    args:
+      - tail
+      - '-f'
+      - /dev/null
+    env:
+      - name: HOME
+        value: /projects/
+  - id: ms-python/python/latest
+    type: chePlugin
+  - alias: ansible-plugin
+    type: chePlugin
+    reference: https://raw.githubusercontent.com/nmalvankar/che-ansible/master/plugin/meta.yaml
+  - id: redhat/vscode-yaml/latest
+    type: chePlugin
+
+commands:
+  - name: "Molecule: Lint"
+    actions:
+      - type: exec
+        command: molecule lint
+        component: ansible
+        workdir: /projects/ansible-role-tower-config
+
+  - name: "Yamllint: workshops"
+    actions:
+      - type: exec
+        command: yamllint .
+        component: ansible
+        workdir: /projects/workshops
+
+  - name: "Workshop: RHEL"
+    actions:
+      - type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-rhel.yml
+        component: ansible
+        workdir: /projects/workshops/provisioner
+
+  - name: "Workshop: Networking"
+    actions:
+      - type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-networking.yml
+        component: ansible
+        workdir: /projects/workshops/provisioner
+
+  - name: "Workshop: Security"
+    actions:
+      - type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-security.yml
+        component: ansible
+        workdir: /projects/workshops/provisioner
+
+  - name: "Workshop: F5"
+    actions:
+      - type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-f5.yml
+        component: ansible
+        workdir: /projects/workshops/provisioner
+
+
+
+
