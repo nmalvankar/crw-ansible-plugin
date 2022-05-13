@@ -40,16 +40,6 @@ components:
   - type: chePlugin
     reference: 'https://raw.githubusercontent.com/nmalvankar/che-ansible/master/plugin/meta.yaml'
     alias: ansible-plugin
-projects:
-  - name: demopoc
-    source:
-      location: 'https://github.com/victorock/demopoc'
-      type: git
-      branch: dev
-  - name: examples
-    source:
-      location: 'https://github.com/ansible/ansible-examples'
-      type: git
 
 
 
