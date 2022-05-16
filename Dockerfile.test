@@ -1,0 +1,45 @@
+FROM registry.redhat.io/codeready-workspaces/plugin-java11-rhel8@sha256:cff9e47f83c6140d442721ed4d78e029a55f98bdca8efffbba8513656a1b28a7
+USER root
+ENV ANSIBLE_VERSION="2.9.27" \
+    ANSIBLE_CONFIG="/etc/ansible/ansible.cfg"
+
+RUN INSTALL_PKGS="python39 python39-devel python39-setuptools python39-pip" &&\
+    yum -y module enable python39:3.9 && \
+    yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum -y clean all --enablerepo='*'
+
+RUN python3.9 -m pip install --upgrade pip &&\
+    python3.9 -m pip install --no-cache-dir virtualenv
+
+RUN pip3 install "ansible==${ANSIBLE_VERSION}" \
+    virtualenv \
+    ansible-lint==5.4.0 \
+    molecule \
+    yamllint \
+    pyOpenSSL \
+    pyvmomi \
+    netaddr \
+    xmltodict \
+    ansible-review \
+    jmespath \
+    Jinja2 \
+    jq
+
+RUN yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y &&\
+    yum install -y sshpass
+
+RUN /bin/cp -f /etc/yum.conf.org /etc/yum.conf && \
+    rm -f /etc/yum.conf.org
+
+# Required for collections from Private Automation Hub
+# RUN mkdir /projects/.ansible
+# COPY ansible.cfg /projects/.ansible/
+RUN mkdir /etc/ansible
+COPY ansible.cfg /etc/ansible
+# RUN chown -R jboss:99 /projects/.ansible
+RUN chmod 766 /etc/ansible/ansible.cfg
+
+USER jboss
+ENTRYPOINT ["/home/jboss/entrypoint.sh"]
+WORKDIR /projects
