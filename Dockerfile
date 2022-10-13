@@ -1,4 +1,4 @@
-FROM registry.redhat.io/codeready-workspaces/plugin-java11-rhel8@sha256:79b59596870382e968850bc241ac41a3345a9079f28251808e35479f92bd3b86
+FROM registry.redhat.io/devspaces/udi-rhel8@sha256:d55549aad15742f6f7310da0c7abc1e65dd5d3ad2e3efb8fbf414cf91b9efac7
 USER root
 ENV ANSIBLE_VERSION="2.9.27"
 
@@ -24,7 +24,3 @@ RUN pip3 install "ansible==${ANSIBLE_VERSION}" \
     jmespath \
     Jinja2 \
     jq
-
-USER jboss
-ENTRYPOINT ["/home/jboss/entrypoint.sh"]
-WORKDIR /projects
